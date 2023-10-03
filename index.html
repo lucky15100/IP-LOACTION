@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Office Application</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            width: 445px;
+            height: 44px;
+            top: 33px;
+            left: 41px;
+            font-family: Montserrat;
+            font-size: 36px;
+            font-weight: 700;
+            line-height: 44px;
+            letter-spacing: 0em;
+            text-align: left;
+            color: purple;
+            position: absolute;
+        }
+
+        .description {
+            width: 651px;
+            height: 58px;
+            top: 106px;
+            left: 41px;
+            font-family: Inter;
+            font-size: 24px;
+            font-weight: 400;
+            line-height: 29px;
+            letter-spacing: 0em;
+            text-align: left;
+            position: absolute;
+            color: white;
+        }
+
+        .container {
+            width: 613px;
+            height: 44px;
+            top: 250px; 
+            left: 817px;
+            font-family: Inter;
+            font-size: 36px;
+            font-weight: 700;
+            line-height: 44px;
+            letter-spacing: 0em;
+            text-align: left;
+            background: linear-gradient(0deg, #B8BCCC, #B8BCCC),
+                        linear-gradient(0deg, #FFFFFF, #FFFFFF);
+            position: absolute;
+        }
+
+        .button {
+            width: 155px;
+            height: 34px;
+            top: 320px;
+            left: 1046px;
+            font-family: Inter;
+            font-size: 28px;
+            font-weight: 400;
+            line-height: 34px;
+            letter-spacing: 0em;
+            text-align: left;
+            background: #B8BCCC;
+            position: absolute;
+            cursor: pointer;
+        }
+
+        .left-background {
+            width: 50%;
+            height: 100%;
+            background: #000;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .right-background {
+            width: 50%;
+            height: 100%;
+            background: #B8BCCC;
+            position: absolute;
+            top: 0;
+            left: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div class="left-background"></div>
+    <div class="right-background"></div>
+
+    <div class="header">Post Office Application</div>
+    <div class="description">
+        This Application Allows you to extract information about the nearest Post Offices, based on your location.
+    </div>
+    
+    <div class="container">
+        Your Current IPv4 Address: <span id="ip-address">Loading...</span>
+    </div>
+    <button class="button" onclick="openNewPage()">Get Started</button>
+
+    <script>
+        function getIpAddress() {
+            document.getElementById('ip-address').textContent = 'Loading...'; // Show "Loading..." message
+            fetch('https://api.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('ip-address').textContent = data.ip;
+                })
+                .catch(error => {
+                    console.error('Error fetching IPv4 address:', error);
+                    document.getElementById('ip-address').textContent = 'Error';
+                });
+        }
+        getIpAddress(); 
+        function openNewPage() {
+            window.open('ip-details.html', '_blank'); 
+        }
+
+    </script>
+</body>
+</html>

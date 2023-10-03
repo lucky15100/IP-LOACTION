@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Details</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: black;
+        }
+
+        .ip-details-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            padding: 20px;
+        }
+
+        p {
+            font-family: Montserrat;
+            font-size: 24px;
+            font-weight: 400;
+            letter-spacing: 0em;
+            text-align: left;
+            color: grey;
+            margin: 10px 0;
+            padding: 5px 0;
+        }
+
+        .ip-details-box {
+            background-color: black;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            margin-top: 20px;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+
+        .ip-detail {
+            width: 32%;
+        }
+
+        .right-column {
+            width: 32%;
+        }
+
+        #map {
+            width: 100%;
+            height: 400px;
+            margin-top: 20px;
+        }
+
+        h2 {
+            font-family: Montserrat;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 0em;
+            text-align: left;
+            color: white;
+            margin-top: 20px;
+        }
+
+        h3 {
+            font-family: Montserrat;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 0em;
+            text-align: left;
+            color: white;
+            margin-top: 20px;
+        }
+        .postal {
+            padding-top: 120px;
+            
+
+        }
+        .postal h1{
+            color: white;
+            padding-left: 10px;
+        }
+        .office-container {
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #575A85;
+    color: white;
+    border-radius: 10px;
+    width: 300px;
+    
+}
+
+#postOfficesList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    
+}
+    </style>
+</head>
+<body>
+    <div class="ip-details-container">
+        <div class="ip-details-box">
+            <div class="ip-detail">
+                <p>Your IP Address: <span id="ip-address">Loading...</span></p>
+                <p>Lat: <span id="latitude">Loading...</span></p>
+                <p>Long: <span id="longitude">Loading...</span></p>
+            </div>
+            <div class="ip-detail">
+                <p>City: <span id="city">Loading...</span></p>
+                <p>Region: <span id="region">Loading...</span></p>
+            </div>
+            <div class="ip-detail right-column">
+                <p>Organization: <span id="organization">Loading...</span></p>
+                <p>Hostname: <span id="hostname">Loading...</span></p>
+            </div>
+        </div>
+        <h2>Your Current Location</h2>
+
+        
+        <iframe id="map" frameborder="0" style="border: 0" allowfullscreen=""></iframe>
+
+
+        <h3>More Information About You</h3>
+        <p>Time Zone: <span id="time-zone">Loading...</span></p>
+        <p>Date and Time: <span id="date-time">Loading...</span></p>
+        <p>Pincode: <span id="pincode">Loading...</span></p>
+        <p>Message: <span id="message">Loading...</span></p>
+        <p>Number of pincode(s) found: <span id="num-pincodes">Loading...</span></p>
+    </div>
+    <h1>Post office near you</h1>
+  <div class="postal"> <h1>Post Office near you</h1>
+<input type="text" id="pincodeInput" placeholder="Search by name" value="110001"> <!-- Set the default value here -->
+<button onclick="fetchPostOffices()">Search</button>
+<div id="postOfficesList"></div>
+
+</div>
+
+    <script>
+        function displayIpDetails() {
+            fetch('https://api.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('ip-address').textContent = `Your IP Address: ${data.ip}`;
+                    fetch(`https://ipapi.co/${data.ip}/json/`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            document.getElementById('latitude').textContent = data.latitude;
+                            document.getElementById('longitude').textContent = data.longitude;
+                            document.getElementById('city').textContent = data.city;
+                            document.getElementById('region').textContent = data.region;
+                            document.getElementById('organization').textContent = data.org;
+                            document.getElementById('hostname').textContent = data.hostname;
+                            const mapIframe = document.getElementById('map');
+                            mapIframe.src = `https://maps.google.com/maps?q=${data.latitude},${data.longitude}&output=embed`;
+                            document.getElementById('time-zone').textContent = data.timezone;
+                            document.getElementById('date-time').textContent = new Date().toLocaleString();
+                            document.getElementById('pincode').textContent = data.postal;
+                            document.getElementById('message').textContent = data.message;
+                            document.getElementById('num-pincodes').textContent = data.pincodes;
+                        })
+                        .catch(error => {
+                            console.error('Error fetching IP details:', error);
+                            document.getElementById('ip-address').textContent = 'Error';
+                        });
+                })
+                .catch(error => {
+                    console.error('Error fetching IP address:', error);
+                    document.getElementById('ip-address').textContent = 'Error';
+                });
+        }
+
+        displayIpDetails();
+        function fetchPostOffices() {
+        const pincode = document.getElementById("pincodeInput").value;
+        const postOfficesList = document.getElementById("postOfficesList");
+
+        const apiUrl = `https://api.postalpincode.in/pincode/${pincode}`;
+
+        postOfficesList.innerHTML = "";
+
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                if (data[0] && data[0].PostOffice.length > 0) {
+                    data[0].PostOffice.forEach(office => {
+                        const officeContainer = document.createElement("div");
+                        officeContainer.classList.add("office-container");
+
+                        officeContainer.innerHTML = `<strong>Name:</strong> ${office.Name}<br>
+                                                    <strong>Branch Type:</strong> ${office.BranchType}<br>
+                                                    <strong>Delivery Status:</strong> ${office.DeliveryStatus}<br>
+                                                    <strong>District:</strong> ${office.District}<br>
+                                                    <strong>Division:</strong> ${office.Division}`;
+
+                        postOfficesList.appendChild(officeContainer);
+                    });
+                } else {
+                    postOfficesList.textContent = "No post offices found for this pincode.";
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching data:", error);
+                postOfficesList.textContent = "An error occurred while fetching data.";
+            });
+    }
+
+    window.onload = fetchPostOffices;
+
+        
+    </script>
+</body>
+</html>
